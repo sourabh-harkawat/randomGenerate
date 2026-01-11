@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Quote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    /* Apple-style minimal UI */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    .card {
+      width: min(720px, 90%);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .quote {
+      font-size: clamp(22px, 2.4vw, 30px);
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+
+    .author {
+      font-size: 14px;
+      opacity: 0.75;
+      margin-bottom: 28px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      background: rgba(255, 255, 255, 0.18);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div id="quote" class="quote">
+      Loading quote…
+    </div>
+    <div id="author" class="author"></div>
+    <button id="refreshBtn">Refresh</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    const API_URL =
+      "https://motivational-spark-api.vercel.app/api/quotes/random";
+
+    const quoteEl = document.getElementById("quote");
+    const authorEl = document.getElementById("author");
+    const statusEl = document.getElementById("status");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    async function fetchQuote() {
+      statusEl.textContent = "Fetching quote…";
+
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        // ✅ Validation
+        if (!data.quote || !data.author) {
+          throw new Error("Invalid API response");
+        }
+
+        quoteEl.textContent = `“${data.quote}”`;
+        authorEl.textContent = `— ${data.author}`;
+        statusEl.textContent = "Quote loaded successfully";
+      } catch (error) {
+        console.error(error);
+        quoteEl.textContent = "Failed to load quote.";
+        authorEl.textContent = "";
+        statusEl.textContent = "Error fetching quote";
+      }
+    }
+
+    refreshBtn.addEventListener("click", fetchQuote);
+
+    // Initial load
+    fetchQuote();
+  </script>
+</body>
+</html>
